@@ -8,30 +8,24 @@ function BookCard({ book }) {
   const year = book.first_publish_year ?? 'Año desconocido'
 
   return (
-    <div>
+    <div className="flex flex-col gap-2 cursor-pointer group">
       {coverUrl ? (
-        <img src={coverUrl} alt={book.title} />
+        <img
+          src={coverUrl}
+          alt={book.title}
+          className="w-full rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-200"
+        />
       ) : (
-        <div style={{
-          width: '128px',
-          height: '193px',
-          backgroundColor: '#2d2d2d',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '8px',
-          textAlign: 'center',
-        }}>
-          <span style={{ fontSize: '32px' }}>📚</span>
-          <p style={{ fontSize: '12px', color: '#aaa', marginTop: '8px' }}>
-            {book.title}
-          </p>
+        <div className="w-full aspect-[2/3] bg-gray-800 rounded-lg flex flex-col items-center justify-center p-3 text-center group-hover:scale-105 transition-transform duration-200">
+          <span className="text-3xl">📚</span>
+          <p className="text-xs text-gray-400 mt-2 line-clamp-3">{book.title}</p>
         </div>
       )}
-      <h3>{book.title}</h3>
-      <p>{author}</p>
-      <p>{year}</p>
+      <div>
+        <p className="text-sm font-semibold leading-tight line-clamp-2">{book.title}</p>
+        <p className="text-xs text-gray-400 mt-1">{author}</p>
+        <p className="text-xs text-gray-500">{year}</p>
+      </div>
     </div>
   )
 }
