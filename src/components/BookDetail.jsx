@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react'
 
-function BookDetail({ book, onBack }) {
+function BookDetail({ book, onBack, library }) {
+  const { addBook, updateStatus, updateRating, removeBook, getBook } = library
+  const savedBook = getBook(book.key)
+
   const [details, setDetails] = useState(null)
   const [pages, setPages] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [ratingInput, setRatingInput] = useState(savedBook?.rating ?? '')
 
   const coverId = book.cover_i
   const coverUrl = coverId
@@ -44,13 +48,21 @@ function BookDetail({ book, onBack }) {
       }
     }
     fetchDetails()
-  }, [book.key])
+  }, [book.key, book.number_of_pages_median])
 
   const description = details?.description
     ? typeof details.description === 'string'
       ? details.description
       : details.description.value
     : null
+
+  function handleStatusChange(status) {
+    if (!savedBook) {
+      addBook(book, status)
+    } else {
+      updateStatus(book.key, status)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -85,6 +97,75 @@ function BookDetail({ book, onBack }) {
             <div>
               <h1 className="text-3xl font-bold leading-tight">{book.title}</h1>
               <p className="text-xl text-gray-300 mt-2">{authors}</p>
+            </div>
+
+            <div className="bg-gray-800 rounded-xl p-5 flex flex-col gap-4">
+              <p className="text-xs text-gray-500 uppercase tracking-widest">Tu biblioteca</p>
+
+              <div className="flex gap-3">
+                {[
+                  { status: 'quiero_leer', icon: '🔖', label: 'Quiero leer' },
+                  { status: 'leyendo', icon: '📖', label: 'Leyendo' },
+                  { status: 'leído', icon: '✅', label: 'Leído' },
+                ].map(({ status, icon, label }) => (
+                  <button
+                    key={status}
+                    onClick={() => handleStatusChange(status)}
+                    className={`flex-1 flex flex-col items-center gap-2 py-4 px-3 rounded-xl border text-sm font-medium transition-all ${
+                      savedBook?.status === status
+                        ? 'bg-blue-950 border-blue-500 text-blue-300'
+                        : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-500'
+                    }`}
+                  >
+                    <span className="text-2xl">{icon}</span>
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {savedBook?.status === 'leído' && (
+                <>
+                  <div className="h-px bg-gray-700" />
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Tu nota</p>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => {
+                            setRatingInput(star)
+                            updateRating(book.key, star)
+                          }}
+                          className={`text-3xl transition-colors ${
+                            star <= (ratingInput || 0)
+                              ? 'text-amber-400'
+                              : 'text-gray-700 hover:text-amber-300'
+                          }`}
+                        >
+                          ★
+                        </button>
+                      ))}
+                      {ratingInput && (
+                        <>
+                          <span className="text-xl font-semibold text-white ml-2">{ratingInput}</span>
+                          <span className="text-sm text-gray-500 self-end mb-1">/10</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {savedBook && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => removeBook(book.key)}
+                    className="text-xs text-red-500 hover:text-red-400 transition-colors"
+                  >
+                    Eliminar de mi biblioteca
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

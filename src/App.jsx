@@ -2,11 +2,13 @@ import { useState } from 'react'
 import SearchBar from './components/SearchBar'
 import BookCard from './components/BookCard'
 import BookDetail from './components/BookDetail'
+import useLibrary from './hooks/useLibrary'
 
 function App() {
   const [books, setBooks] = useState([])
   const [loading, setLoading] = useState(false)
   const [selectedBook, setSelectedBook] = useState(null)
+  const library = useLibrary()
 
   async function handleSearch(query) {
     setLoading(true)
@@ -23,6 +25,7 @@ function App() {
       <BookDetail
         book={selectedBook}
         onBack={() => setSelectedBook(null)}
+        library={library}
       />
     )
   }
