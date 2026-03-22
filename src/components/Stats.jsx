@@ -47,18 +47,33 @@ function Stats({ library, onBack }) {
   })()
 
   const topGeneros = (() => {
+    const EXCLUIR = ['award', 'series', 'winner', 'hugo', 'nebula', 'prize', 'fiction/', 'nonfiction/']
     const generos = {}
     library.library.forEach(b => {
       if (b.subjects) {
-        b.subjects.slice(0, 3).forEach(g => {
-          generos[g] = (generos[g] || 0) + 1
-        })
+        b.subjects
+          .filter(g =>
+            !g.includes(':') &&
+            !g.includes('_') &&
+            !g.includes('/') &&
+            !g.match(/^\d/) &&
+            g.length < 40 &&
+            !EXCLUIR.some(e => g.toLowerCase().includes(e))
+          )
+          .slice(0, 3)
+          .forEach(g => {
+            const clean = g.charAt(0).toUpperCase() + g.slice(1)
+            generos[clean] = (generos[clean] || 0) + 1
+          })
       }
     })
     return Object.entries(generos)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
-      .map(([genero, libros]) => ({ genero: genero.length > 20 ? genero.slice(0, 20) + '…' : genero, libros }))
+      .map(([genero, libros]) => ({
+        genero: genero.length > 20 ? genero.slice(0, 20) + '…' : genero,
+        libros
+      }))
   })()
 
   const tooltipStyle = {
