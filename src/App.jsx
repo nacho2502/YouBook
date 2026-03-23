@@ -1,17 +1,17 @@
 import { useState } from 'react'
+import Home from './components/Home'
 import SearchBar from './components/SearchBar'
 import BookCard from './components/BookCard'
 import BookDetail from './components/BookDetail'
 import MyLibrary from './components/MyLibrary'
-import useLibrary from './hooks/useLibrary'
 import Stats from './components/Stats'
+import useLibrary from './hooks/useLibrary'
 
 function App() {
+  const [screen, setScreen] = useState('home')
   const [books, setBooks] = useState([])
   const [loading, setLoading] = useState(false)
   const [selectedBook, setSelectedBook] = useState(null)
-  const [showLibrary, setShowLibrary] = useState(false)
-  const [showStats, setShowStats] = useState(false)
   const library = useLibrary()
 
   async function handleSearch(query) {
@@ -34,72 +34,65 @@ function App() {
     )
   }
 
-  if (showLibrary) {
+  if (screen === 'library') {
     return (
       <MyLibrary
         library={library}
-        onBack={() => setShowLibrary(false)}
-        onBookClick={(book) => {
-          setShowLibrary(false)
-          setSelectedBook(book)
-        }}
+        onBack={() => setScreen('home')}
+        onBookClick={(book) => setSelectedBook(book)}
       />
     )
   }
 
-  if (showStats) {
+  if (screen === 'stats') {
     return (
       <Stats
         library={library}
-        onBack={() => setShowStats(false)}
+        onBack={() => setScreen('home')}
       />
+    )
+  }
+
+  if (screen === 'search') {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white">
+        <div className="max-w-6xl mx-auto px-6 py-10">
+          <div className="flex items-center justify-between mb-8">
+            <button
+              onClick={() => setScreen('home')}
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
+              ← Volver
+            </button>
+            <h1 className="text-2xl font-bold">🔍 Buscar libros</h1>
+            <div className="w-20" />
+          </div>
+          <SearchBar onSearch={handleSearch} />
+          {loading && (
+            <p className="text-center text-gray-400 mt-12">Buscando...</p>
+          )}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 mt-10">
+            {books.map((book) => (
+              <BookCard
+                key={book.key}
+                book={book}
+                onClick={() => setSelectedBook(book)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <div className="max-w-6xl mx-auto px-6 py-10">
-
-        <div className="flex items-center justify-between mb-2">
-          <div className="w-36" />
-          <h1 className="text-4xl font-bold text-center">📚 Mi App de Libros</h1>
-          <div className="w-36 flex justify-end gap-2">
-            <button
-              onClick={() => setShowStats(true)}
-              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-            >
-              📊 Estadísticas
-            </button>
-            <button
-              onClick={() => setShowLibrary(true)}
-              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-            >
-              📖 Mi Biblioteca
-              {library.library.length > 0 && (
-                <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  {library.library.length}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        <p className="text-center text-gray-400 mb-8">Busca cualquier libro del mundo</p>
-        <SearchBar onSearch={handleSearch} />
-        {loading && (
-          <p className="text-center text-gray-400 mt-12">Buscando...</p>
-        )}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 mt-10">
-          {books.map((book) => (
-            <BookCard
-              key={book.key}
-              book={book}
-              onClick={() => setSelectedBook(book)}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
+    <Home
+      library={library}
+      onBookClick={(book) => setSelectedBook(book)}
+      onSearch={() => setScreen('search')}
+      onLibrary={() => setScreen('library')}
+      onStats={() => setScreen('stats')}
+    />
   )
 }
 
