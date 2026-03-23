@@ -25,7 +25,7 @@ function getTopGenero(library) {
   return sorted[0]?.[0] ?? null
 }
 
-function Home({ library, onBookClick, onSearch, onLibrary, onStats }) {
+function Home({ library, onBookClick, onSearch, onLibrary, onStats, username, onEditUsername }) {
   const [recomendaciones, setRecomendaciones] = useState([])
   const [loadingRecs, setLoadingRecs] = useState(false)
   const [topGenero, setTopGenero] = useState(null)
@@ -62,7 +62,7 @@ function Home({ library, onBookClick, onSearch, onLibrary, onStats }) {
     }
 
     fetchRecomendaciones()
-  }, [library.library.length])
+  }, [tieneLibros, library.library.length, library.library])
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -97,9 +97,17 @@ function Home({ library, onBookClick, onSearch, onLibrary, onStats }) {
           </div>
         </div>
 
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-white">Bienvenido 👋</h2>
-          <p className="text-gray-400 text-sm mt-1">Aquí tienes un resumen de tu actividad lectora</p>
+        <div className="mb-8 flex items-center justify-between">
+            <div>
+                <h2 className="text-2xl font-semibold text-white">Buenas, {username}</h2>
+                <p className="text-gray-400 text-sm mt-1">Aquí tienes un resumen de tu actividad lectora</p>
+            </div>
+            <button
+                onClick={onEditUsername}
+                className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            >
+                ✏️ Editar nombre
+            </button>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-10">

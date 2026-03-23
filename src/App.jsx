@@ -5,7 +5,9 @@ import BookCard from './components/BookCard'
 import BookDetail from './components/BookDetail'
 import MyLibrary from './components/MyLibrary'
 import Stats from './components/Stats'
+import Welcome from './components/Welcome'
 import useLibrary from './hooks/useLibrary'
+import useUsername from './hooks/useUsername'
 
 function App() {
   const [screen, setScreen] = useState('home')
@@ -13,6 +15,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [selectedBook, setSelectedBook] = useState(null)
   const library = useLibrary()
+  const { username, saveUsername } = useUsername()
 
   async function handleSearch(query) {
     setLoading(true)
@@ -22,6 +25,10 @@ function App() {
     const data = await response.json()
     setBooks(data.docs)
     setLoading(false)
+  }
+
+  if (!username) {
+    return <Welcome onSave={saveUsername} />
   }
 
   if (selectedBook) {
@@ -92,6 +99,8 @@ function App() {
       onSearch={() => setScreen('search')}
       onLibrary={() => setScreen('library')}
       onStats={() => setScreen('stats')}
+      username={username}
+      onEditUsername={() => saveUsername('')}
     />
   )
 }
